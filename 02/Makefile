@@ -6,7 +6,7 @@ OBJS = $(patsubst %.c,%.o,$(SRCS))
 CFLAGS = -Wall `pkg-config --cflags gtk+-3.0`
 #LFLAGS = `pkg-config --libs gtk+-2.0`
 LFLAGS = `pkg-config --libs gtk+-3.0`
-TGTS = ex01
+TGTS = ex02
 
 all : $(TGTS)
 
