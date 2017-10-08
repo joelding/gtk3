@@ -1,0 +1,3 @@
+[submodule "foundations-of-gtk-dev"]
+	path = foundations-of-gtk-dev
+	url = https://github.com/Apress/foundations-of-gtk-dev.git
