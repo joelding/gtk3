@@ -1,31 +1,62 @@
 #include <glib.h>
 
-static gboolean src_callback(gpointer user_data)
+static gpointer thread_push(gpointer data)
 {
-	GMainLoop *loop = (GMainLoop *)user_data;
-	g_main_loop_quit(loop);
+	GAsyncQueue *queue = (GAsyncQueue *)data;
+	int n = 50, *p;
 
-	return FALSE; // the source should be removed
+	while (n > 0) {
+		//g_print("%s+\n", __func__);
+		//g_async_queue_lock(queue);
+		p = g_new0(int, 1);
+		*p = n;
+		g_print("push %d\n", n);
+		g_async_queue_push(queue, p);
+		//g_async_queue_unlock(queue);
+		--n;
+		g_usleep(1);
+		//g_print("%s-\n", __func__);
+	}
+
+	return NULL;
+}
+
+static gpointer thread_pop(gpointer data)
+{
+	GAsyncQueue *queue = (GAsyncQueue *)data;
+	int n = 50, *p;
+
+	while (n > 0) {
+		//g_print("%s+\n", __func__);
+		//g_async_queue_lock(queue);
+		if ((p = g_async_queue_try_pop(queue)))
+		{
+			g_print("pop %d\n", *(int *)p);
+			g_free(p);
+			--n;
+		}
+		//g_async_queue_unlock(queue);
+		//g_print("%s-\n", __func__);
+	}
+
+	return NULL;
 }
 
 int main(int argc,
 	 char *argv[])
 {
-	GMainLoop *mloop = g_main_loop_new(NULL, FALSE);
-	GSource *src = g_timeout_source_new_seconds(5);
+	GThread *thread[2];
+	GAsyncQueue *queue = g_async_queue_new();
 
-	g_print("Start loop!\n");
-	g_source_set_callback(src,
-						  src_callback,
-						  mloop, NULL);
-	g_source_attach(src, NULL);
+	thread[0] = g_thread_new(NULL, thread_push, queue);	
+	thread[1] = g_thread_new(NULL, thread_pop, queue);	
 
-	g_main_loop_run(mloop);
+	g_thread_join(thread[0]);
+	g_thread_join(thread[1]);
+	g_thread_unref(thread[0]);
+	g_thread_unref(thread[1]);
+	g_async_queue_unref(queue);
 
-	g_source_unref(src);	
-	g_main_loop_unref(mloop);
-	g_print("Exit!\n");
-	
 	return 0;
 }
 

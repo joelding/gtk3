@@ -4,7 +4,7 @@ SRCS = $(wildcard *.c)
 OBJS = $(patsubst %.c,%.o,$(SRCS))
 CFLAGS = -Wall `pkg-config --cflags glib-2.0`
 LFLAGS = `pkg-config --libs glib-2.0` -liconv
-TGTS = ex69
+TGTS = ex70
 
 all : $(TGTS)
 

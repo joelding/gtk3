@@ -8,6 +8,7 @@ static gpointer thread_func(gpointer data)
 	while (cnt < 10)
 	{
 		g_print("thread %d\n", n);
+		//g_usleep(1); /* 1us */
 		++cnt;
 	}
 
